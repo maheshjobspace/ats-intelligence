@@ -1652,13 +1652,18 @@ function showSampleReport(){
       low:['Add a Certifications section — even in-progress AWS or CKA certs signal intent and close credibility gaps.']
     }
   };
-  isLoggedIn=true;
-  showPage('analyze');
+
+  // Show analyze page, hide form, show results
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-analyze').classList.add('active');
+  document.getElementById('analyze-form-section').style.display='none';
+  document.getElementById('loaderSection').classList.remove('show');
+  document.getElementById('resultsSection').classList.remove('show');
+  window.scrollTo(0,0);
+
   setTimeout(()=>{
-    document.getElementById('analyze-form-section').style.display='none';
-    document.getElementById('loaderSection').classList.remove('show');
-    renderResults(sampleData,'Sample Job Description — Senior Software Engineer');
-  },100);
+    renderResults(sampleData,'Sample — Senior Software Engineer at a Product Company');
+  }, 50);
 }
 </script>
 
