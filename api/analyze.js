@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -19,7 +18,7 @@ ${resumeText.slice(0, 6000)}
 
 JOB DESCRIPTION:
 """
-${jd ? jd.slice(0, 3000) : 'No job description provided. Perform a general resume quality analysis across all dimensions based on the resume content alone. Infer the likely target role from the resume and score accordingly.'}
+${jd ? jd.slice(0, 3000) : 'No job description provided. Perform a general resume quality analysis. Infer the likely target role from the resume and score accordingly.'}
 """
 
 SCORING WEIGHTS:
@@ -35,7 +34,8 @@ SCORING WEIGHTS:
 
 SCORE SCALE: 100=Exceptional, 90-99=Strong, 80-89=Competitive, 70-79=Interview Possible, 60-69=Significant Gaps, <60=Unlikely to Pass ATS
 
-Return ONLY valid JSON in exactly this structure (no markdown, no extra text):
+CRITICAL: Return ONLY a raw JSON object. No markdown. No backticks. No code fences. No explanation. No thinking. Start your response with { and end with }
+
 {
   "overallScore": 0,
   "atsScore": 0,
@@ -71,9 +71,7 @@ Return ONLY valid JSON in exactly this structure (no markdown, no extra text):
   },
   "impactAnalysis": {
     "score": 0,
-    "items": [
-      {"label": "Example Impact", "value": 0}
-    ]
+    "items": [{"label": "Example", "value": 0}]
   },
   "formattingAnalysis": {
     "score": 0,
@@ -108,48 +106,46 @@ Return ONLY valid JSON in exactly this structure (no markdown, no extra text):
 }`;
 
   try {
-    const response = await fetch(
-  `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.2,
-      },
-    }),
-  }
-);
+    const apiKey = process.env.GEMINI_API_KEY;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-if (!response.ok) {
-  const errText = await response.text();
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 4000,
+          responseMimeType: 'application/json'
+        }
+      })
+    });
 
-  return res.status(500).json({
-    error: errText
-  });
-}
+    if (!response.ok) {
+      const errText = await response.text();
+      return res.status(500).json({ error: errText });
+    }
 
-const data = await response.json();
+    const data = await response.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
 
-const raw =
-  data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    // Strip any markdown fences just in case
+    const cleaned = raw
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/```\s*$/i, '')
+      .trim();
 
-const cleaned = raw.replace(/```json|```/g, '').trim();
+    // Extract JSON object if there's surrounding text
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: 'No valid JSON in response', raw: cleaned.slice(0, 300) });
+    }
 
-const parsed = JSON.parse(cleaned);
-
+    const parsed = JSON.parse(jsonMatch[0]);
     return res.status(200).json(parsed);
+
   } catch (err) {
     console.error('Analysis error:', err);
     return res.status(500).json({ error: err.message || 'Analysis failed' });
