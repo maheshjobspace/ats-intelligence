@@ -969,14 +969,18 @@ const firebaseConfig = {
   measurementId: "G-6B3Y1B7MZD"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-auth.useDeviceLanguage();
-
-// Expose to global scope so non-module script can call them
-window._fbAuth = auth;
-window._RecaptchaVerifier = RecaptchaVerifier;
-window._signInWithPhoneNumber = signInWithPhoneNumber;
+try {
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  auth.useDeviceLanguage();
+  window._fbAuth = auth;
+  window._RecaptchaVerifier = RecaptchaVerifier;
+  window._signInWithPhoneNumber = signInWithPhoneNumber;
+  window._firebaseReady = true;
+} catch(e) {
+  console.warn('Firebase init failed:', e);
+  window._firebaseReady = false;
+}
 </script>
 
 <script>
@@ -997,6 +1001,9 @@ function showPage(id){
 // ─── RECAPTCHA SETUP ───
 function setupRecaptcha(){
   if(window.recaptchaVerifier) return;
+  if(!window._RecaptchaVerifier || !window._fbAuth){
+    throw new Error('Firebase not ready yet. Please wait a moment and try again.');
+  }
   window.recaptchaVerifier = new window._RecaptchaVerifier(window._fbAuth, 'recaptcha-container', {
     size: 'invisible',
     callback: () => {}
@@ -1040,6 +1047,7 @@ async function modalSendOtp(){
   const btn=document.getElementById('modalSendOtpBtn');
   err.classList.remove('show');
   if(phone.length<10){err.textContent='Enter a valid 10-digit number.';err.classList.add('show');return;}
+  if(!window._fbAuth){err.textContent='Still loading. Please wait a second and try again.';err.classList.add('show');return;}
 
   const fullPhone = code + phone;
   pendingPhone = code + ' ' + phone.slice(0,5) + ' ' + phone.slice(5);
@@ -1522,8 +1530,10 @@ async function loginPageSendOtp(){
   const btn = document.getElementById('loginPageSendBtn');
   err.classList.remove('show');
   if(phone.length<10){err.textContent='Enter a valid 10-digit number.';err.classList.add('show');return;}
+  if(!window._fbAuth){err.textContent='Still loading. Please wait a second and try again.';err.classList.add('show');return;}
 
   const fullPhone = code + phone;
+  const display = code+' '+phone.slice(0,5)+' '+phone.slice(5);
   btn.disabled=true; btn.textContent='Sending...';
 
   try {
@@ -1531,15 +1541,21 @@ async function loginPageSendOtp(){
       window.loginRecaptchaVerifier = new window._RecaptchaVerifier(window._fbAuth,'recaptcha-container',{size:'invisible',callback:()=>{}});
     }
     loginPageConfirmation = await window._signInWithPhoneNumber(window._fbAuth, fullPhone, window.loginRecaptchaVerifier);
-    const display = code+' '+phone.slice(0,5)+' '+phone.slice(5);
+
+    // Navigate to OTP page only after successful send
     document.getElementById('loginPagePhoneDisplay').innerHTML='📱 <strong>'+display+'</strong>';
     showPage('otp');
     startLoginPageTimer();
+    // Reset OTP inputs
+    for(let i=0;i<6;i++){const el=document.getElementById('lp'+i);if(el){el.value='';el.classList.remove('filled');}}
+    document.getElementById('loginPageVerifyBtn').disabled=true;
+    document.getElementById('loginPageOtpError').classList.remove('show');
+    document.getElementById('loginPageOtpSuccess').classList.remove('show');
     setTimeout(()=>document.getElementById('lp0').focus(),200);
   } catch(e){
     err.textContent = e.code==='auth/too-many-requests' ? 'Too many attempts. Please try again later.'
       : e.code==='auth/invalid-phone-number' ? 'Invalid phone number.'
-      : 'Failed to send OTP: '+e.message;
+      : e.message || 'Failed to send OTP.';
     err.classList.add('show');
     if(window.loginRecaptchaVerifier){window.loginRecaptchaVerifier.clear();window.loginRecaptchaVerifier=null;}
   } finally { btn.disabled=false; btn.textContent='Send OTP →'; }
