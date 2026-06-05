@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#080C14;
@@ -355,29 +356,49 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
   .score-cards-grid{grid-template-columns:repeat(3,1fr)}
   .kw-stats{grid-template-columns:1fr 1fr}
 }
+
+/* ── STEP FLOW ── */
+.flow-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(8,12,20,0.95);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:1.5rem}
+.flow-overlay.show{display:flex}
+.flow-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:440px;animation:fadeUp .25s ease both}
+.flow-logo{font-family:var(--font-display);font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px;margin-bottom:1.75rem;cursor:pointer}
+.flow-logo-mark{width:28px;height:28px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff}
+.flow-steps{display:flex;gap:0;margin-bottom:1.75rem}
+.flow-step-dot{flex:1;height:3px;background:var(--border2);border-radius:2px;transition:background .3s}
+.flow-step-dot.done{background:var(--green)}
+.flow-step-dot.active{background:var(--accent)}
+.flow-title{font-family:var(--font-display);font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;margin-bottom:0.4rem}
+.flow-sub{font-size:13px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:1.5rem}
+.flow-err{background:rgba(232,69,69,0.08);border:1px solid rgba(232,69,69,0.2);border-radius:8px;padding:10px 14px;color:var(--red);font-size:13px;margin-bottom:1rem;display:none}
+.flow-err.show{display:block}
+.flow-suc{background:rgba(34,199,122,0.08);border:1px solid rgba(34,199,122,0.2);border-radius:8px;padding:10px 14px;color:var(--green);font-size:13px;margin-bottom:1rem;display:none}
+.flow-suc.show{display:block}
+.flow-btn{width:100%;padding:13px;background:var(--accent);border:none;color:#fff;font-family:var(--font-display);font-size:14px;font-weight:700;border-radius:10px;cursor:pointer;transition:all .25s;margin-top:4px}
+.flow-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.flow-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.flow-back{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;gap:5px;padding:0;margin-bottom:1.5rem;transition:color .2s}
+.flow-back:hover{color:var(--text)}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a class="nav-logo" href="#" onclick="showPage('home')">
+  <a class="nav-logo" href="#" onclick="showHome();return false;">
     <div class="logo-mark">AI</div>
     ATS Intelligence
   </a>
   <ul class="nav-links">
-    <li><a href="#" onclick="showPage('home')">Home</a></li>
+    <li><a href="#" onclick="showHome();return false;">Home</a></li>
     <li><a href="#features">Features</a></li>
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#howitworks">How it works</a></li>
   </ul>
   <div class="nav-cta">
-    <button class="btn-ghost" onclick="showPage('login')">Sign in</button>
-    <button class="btn-primary" onclick="showPage('analyze')">Get Started Free →</button>
+    <button class="btn-primary" onclick="goToAnalyze()">Get Started Free →</button>
   </div>
 </nav>
 
-<!-- ===== HOME PAGE ===== -->
 <div id="page-home" class="page active">
 
   <!-- HERO -->
@@ -395,7 +416,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
       Enterprise-grade resume analysis that tells you exactly why you're getting rejected — and how to fix it in minutes.
     </p>
     <div class="hero-actions">
-      <button class="btn-lg btn-lg-primary" onclick="showPage('analyze')">Analyze My Resume →</button>
+      <button class="btn-lg btn-lg-primary" onclick="goToAnalyze()">Analyze My Resume →</button>
       <button class="btn-lg btn-lg-ghost" onclick="showSampleReport()">See a sample report</button>
     </div>
     <div class="hero-stats">
@@ -613,7 +634,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
             <li class="no">Resume rewriting</li>
             <li class="no">Cover letter AI</li>
           </ul>
-          <button class="btn-primary" style="width:100%;padding:10px" onclick="showPage('analyze')">Start Free →</button>
+          <button class="btn-primary" style="width:100%;padding:10px" onclick="goToAnalyze()">Start Free →</button>
         </div>
         <div class="price-card featured">
           <div class="price-badge">MOST POPULAR</div>
@@ -629,7 +650,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
             <li>AI resume rewriting</li>
             <li>Cover letter generation</li>
           </ul>
-          <button class="btn-primary" style="width:100%;padding:10px" onclick="showPage('analyze')">Get Pro →</button>
+          <button class="btn-primary" style="width:100%;padding:10px" onclick="goToAnalyze()">Get Pro →</button>
         </div>
       </div>
     </div>
@@ -650,153 +671,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
   </footer>
 </div>
 
-<!-- ===== LOGIN PAGE ===== -->
-<!-- ===== LOGIN PAGE (Sign in from nav) ===== -->
-<div id="page-login" class="page" style="padding-top:0">
-  <div class="auth-page">
-    <div class="auth-grid-bg"></div>
-    <div class="auth-glow"></div>
-    <div class="auth-card">
-      <div class="auth-logo" onclick="showPage('home')">
-        <div class="auth-logo-mark">AI</div>
-        ATS Intelligence
-      </div>
-      <h1 class="auth-title">Welcome back</h1>
-      <p class="auth-sub">Enter your mobile number to sign in or create a free account. We'll send a one-time code.</p>
 
-      <div class="auth-error" id="loginPageError"></div>
-
-      <div class="auth-field-label">MOBILE NUMBER</div>
-      <div class="auth-phone-row">
-        <select class="auth-country" id="loginPageCountry">
-          <option value="+91">🇮🇳 +91</option>
-          <option value="+1">🇺🇸 +1</option>
-          <option value="+44">🇬🇧 +44</option>
-          <option value="+971">🇦🇪 +971</option>
-          <option value="+65">🇸🇬 +65</option>
-          <option value="+61">🇦🇺 +61</option>
-        </select>
-        <input class="auth-phone-input" type="tel" id="loginPagePhone" placeholder="98765 43210" maxlength="10" inputmode="numeric"
-          oninput="this.value=this.value.replace(/\D/g,'');document.getElementById('loginPageSendBtn').disabled=this.value.length<10"/>
-      </div>
-      <button class="auth-btn" id="loginPageSendBtn" onclick="loginPageSendOtp()" disabled>Send OTP →</button>
-
-      <div class="trust-badges" style="margin-top:1.25rem">
-        <span class="trust-badge">🔒 No password needed</span>
-        <span class="trust-badge">⚡ 30-second setup</span>
-        <span class="trust-badge">🆓 Free to start</span>
-      </div>
-      <div class="auth-terms">By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
-    </div>
-  </div>
-</div>
-
-<!-- ===== OTP PAGE (Sign in from nav) ===== -->
-<div id="page-otp" class="page" style="padding-top:0">
-  <div class="auth-page">
-    <div class="auth-grid-bg"></div>
-    <div class="auth-glow"></div>
-    <div class="auth-card">
-      <div class="auth-logo" onclick="showPage('home')">
-        <div class="auth-logo-mark">AI</div>
-        ATS Intelligence
-      </div>
-      <button class="auth-back" onclick="showPage('login')">← Back</button>
-      <h1 class="auth-title">Check your phone</h1>
-      <p class="auth-sub">We sent a 6-digit code to</p>
-      <div class="otp-phone-display" id="loginPagePhoneDisplay">📱 —</div>
-
-      <div class="auth-error" id="loginPageOtpError"></div>
-      <div class="auth-success" id="loginPageOtpSuccess"></div>
-
-      <div class="auth-field-label">ENTER 6-DIGIT OTP</div>
-      <div class="otp-row">
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp0" oninput="loginPageOtpMove(0)" onkeydown="loginPageOtpBack(event,0)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp1" oninput="loginPageOtpMove(1)" onkeydown="loginPageOtpBack(event,1)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp2" oninput="loginPageOtpMove(2)" onkeydown="loginPageOtpBack(event,2)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp3" oninput="loginPageOtpMove(3)" onkeydown="loginPageOtpBack(event,3)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp4" oninput="loginPageOtpMove(4)" onkeydown="loginPageOtpBack(event,4)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp5" oninput="loginPageOtpMove(5)" onkeydown="loginPageOtpBack(event,5)"/>
-      </div>
-      <button class="auth-btn" id="loginPageVerifyBtn" onclick="loginPageVerifyOtp()" disabled>Verify & Continue →</button>
-
-      <div class="resend-row" style="margin-top:1rem;">
-        <span class="timer" id="loginPageTimer">Resend in <span id="loginPageTimerCount">30</span>s</span>
-        <button class="resend-btn" id="loginPageResendBtn" style="display:none" onclick="loginPageResend()">Resend OTP</button>
-      </div>
-      <div class="trust-badges" style="margin-top:1.25rem">
-        <span class="trust-badge">🔐 OTP expires in 10 min</span>
-        <span class="trust-badge">✅ Secure login</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- AUTH MODAL OVERLAY (shown over analyze page when Analyze is clicked without login) -->
-<div id="authModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(8,12,20,0.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1.5rem;">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:420px;position:relative;animation:fadeUp .25s ease both;">
-
-    <!-- Step 1: Phone -->
-    <div id="modalStepPhone">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;">
-        <div style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;">One last step 👋</div>
-        <button onclick="closeAuthModal()" style="background:none;border:none;color:var(--hint);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;">×</button>
-      </div>
-      <p style="font-size:13.5px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:1.5rem;">Your analysis is ready — just verify your number to unlock your score. Free forever, no spam.</p>
-
-      <div style="font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:0.06em;margin-bottom:8px;">MOBILE NUMBER</div>
-      <div class="auth-phone-row" style="margin-bottom:1rem;">
-        <select class="auth-country" id="modalCountryCode">
-          <option value="+91">🇮🇳 +91</option>
-          <option value="+1">🇺🇸 +1</option>
-          <option value="+44">🇬🇧 +44</option>
-          <option value="+971">🇦🇪 +971</option>
-          <option value="+65">🇸🇬 +65</option>
-          <option value="+61">🇦🇺 +61</option>
-        </select>
-        <input class="auth-phone-input" type="tel" id="modalPhoneInput" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'');validateModalPhone()"/>
-      </div>
-      <div class="auth-error" id="modalPhoneError"></div>
-      <button class="auth-btn" id="modalSendOtpBtn" onclick="modalSendOtp()" disabled>Send OTP →</button>
-      <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:1.25rem;">
-        <span class="trust-badge">🔒 No spam ever</span>
-        <span class="trust-badge">⚡ 20 seconds</span>
-        <span class="trust-badge">🆓 Free forever</span>
-      </div>
-
-
-    <!-- Step 2: OTP -->
-    <div id="modalStepOtp" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
-        <button onclick="modalBackToPhone()" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:var(--font-body);display:flex;align-items:center;gap:5px;">← Back</button>
-        <button onclick="closeAuthModal()" style="background:none;border:none;color:var(--hint);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;">×</button>
-      </div>
-      <div style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;margin-bottom:0.5rem;">Enter the code</div>
-      <div class="otp-phone-display" id="modalOtpPhoneDisplay" style="margin-bottom:1.25rem;">📱 +91 XXXXX XXXXX</div>
-
-      <div class="auth-error" id="modalOtpError"></div>
-      <div class="auth-success" id="modalOtpSuccess"></div>
-
-      <div style="font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:0.06em;margin-bottom:10px;">6-DIGIT OTP</div>
-      <div class="otp-row" style="margin-bottom:1.25rem;">
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="mo0" oninput="modalOtpMove(0)" onkeydown="modalOtpBack(event,0)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="mo1" oninput="modalOtpMove(1)" onkeydown="modalOtpBack(event,1)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="mo2" oninput="modalOtpMove(2)" onkeydown="modalOtpBack(event,2)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="mo3" oninput="modalOtpMove(3)" onkeydown="modalOtpBack(event,3)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="mo4" oninput="modalOtpMove(4)" onkeydown="modalOtpBack(event,4)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="mo5" oninput="modalOtpMove(5)" onkeydown="modalOtpBack(event,5)"/>
-      </div>
-      <button class="auth-btn" id="modalVerifyBtn" onclick="modalVerifyOtp()" disabled>Verify & See My Score →</button>
-
-      <div class="resend-row" style="margin-top:1rem;">
-        <span class="timer" id="modalOtpTimer">Resend in <span id="modalTimerCount">30</span>s</span>
-        <button class="resend-btn" id="modalResendBtn" style="display:none" onclick="modalResendOtp()">Resend OTP</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
+<!-- ===== ANALYZE PAGE ===== -->
 <div id="page-analyze" class="page">
   <div id="analyze-form-section">
     <div class="analyze-wrap">
@@ -804,9 +680,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
         <h1 class="analyze-title">Resume Analyzer</h1>
         <p class="analyze-sub">Upload your resume and paste the job description to get your score in seconds.</p>
       </div>
-
       <div class="error-box" id="errorBox"></div>
-
       <div class="analyze-grid">
         <div class="upload-box" id="uploadBox">
           <input type="file" id="resumeFile" accept=".pdf,.txt,.doc,.docx" onchange="handleFileSelect(event)"/>
@@ -819,7 +693,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
           <textarea class="jd-textarea" id="jdInput" placeholder="Paste the job description here for a more accurate, targeted score...&#10;&#10;Leave blank for a general resume quality analysis."></textarea>
         </div>
       </div>
-
       <button class="analyze-btn" id="analyzeBtn" onclick="startAnalysis()">
         ⚡ Analyze My Resume
       </button>
@@ -843,8 +716,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
     </div>
   </div>
 
-  <!-- RESULTS -->
-  <div class="results-wrap" id="resultsSection">
+    <div class="results-wrap" id="resultsSection">
     <div class="results-header">
       <div>
         <div class="results-title">Analysis Complete</div>
@@ -1685,6 +1557,639 @@ function showSampleReport(){
 
 <!-- Firebase invisible reCAPTCHA — required for Phone Auth, do not remove -->
 <div id="recaptcha-container" style="position:fixed;bottom:0;right:0;z-index:0;opacity:0;pointer-events:none;"></div>
+
+</body>
+</html>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STEP FLOW OVERLAY
+     Step 1: Upload (if no file yet)
+     Step 2: Phone number
+     Step 3: OTP
+     Then → run analysis
+════════════════════════════════════════════ -->
+<div id="flowOverlay" class="flow-overlay">
+  <div class="flow-card">
+    <div class="flow-logo" onclick="closeFlow()">
+      <div class="flow-logo-mark">AI</div>ATS Intelligence
+    </div>
+    <div class="flow-steps">
+      <div class="flow-step-dot" id="fdot0"></div>
+      <div style="width:6px"></div>
+      <div class="flow-step-dot" id="fdot1"></div>
+      <div style="width:6px"></div>
+      <div class="flow-step-dot" id="fdot2"></div>
+    </div>
+
+    <!-- STEP 1: Upload -->
+    <div id="fStep1">
+      <div class="flow-title">Upload your resume</div>
+      <div class="flow-sub">PDF, DOCX or TXT file. We'll parse it and run the analysis.</div>
+      <div class="flow-err" id="fErr1"></div>
+      <div class="upload-box" id="flowUploadBox" style="margin-bottom:1rem;min-height:160px;">
+        <input type="file" id="flowResumeFile" accept=".pdf,.txt,.doc,.docx" onchange="handleFlowFile(event)"/>
+        <div class="upload-icon-wrap">📄</div>
+        <div class="upload-title" id="flowUploadTitle">Click or drag to upload</div>
+        <div class="upload-sub" id="flowUploadSub">PDF, DOCX or TXT · max 5MB</div>
+      </div>
+      <button class="flow-btn" id="fBtn1" onclick="flowStep1Next()">Continue →</button>
+    </div>
+
+    <!-- STEP 2: Phone -->
+    <div id="fStep2" style="display:none">
+      <button class="flow-back" onclick="flowGoBack(1)">← Back</button>
+      <div class="flow-title">One last step 👋</div>
+      <div class="flow-sub">Verify your number to unlock your results. Free forever, no spam.</div>
+      <div class="flow-err" id="fErr2"></div>
+      <div style="font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:0.06em;margin-bottom:8px;">MOBILE NUMBER</div>
+      <div class="auth-phone-row" style="margin-bottom:1rem;">
+        <select class="auth-country" id="fCountry">
+          <option value="+91">🇮🇳 +91</option>
+          <option value="+1">🇺🇸 +1</option>
+          <option value="+44">🇬🇧 +44</option>
+          <option value="+971">🇦🇪 +971</option>
+          <option value="+65">🇸🇬 +65</option>
+          <option value="+61">🇦🇺 +61</option>
+        </select>
+        <input class="auth-phone-input" type="tel" id="fPhone" placeholder="98765 43210" maxlength="10" inputmode="numeric"
+          oninput="this.value=this.value.replace(/\D/g,\'\');document.getElementById(\'fBtn2\').disabled=this.value.length<10"/>
+      </div>
+      <button class="flow-btn" id="fBtn2" onclick="flowStep2SendOtp()" disabled>Send OTP →</button>
+      <div style="display:flex;justify-content:center;gap:1rem;margin-top:1rem;">
+        <span class="trust-badge">🔒 No spam</span>
+        <span class="trust-badge">⚡ 20 seconds</span>
+        <span class="trust-badge">🆓 Free forever</span>
+      </div>
+    </div>
+
+    <!-- STEP 3: OTP -->
+    <div id="fStep3" style="display:none">
+      <button class="flow-back" onclick="flowGoBack(2)">← Back</button>
+      <div class="flow-title">Enter the code</div>
+      <div class="flow-sub" id="fOtpSub">We sent a 6-digit code to your number.</div>
+      <div class="flow-err" id="fErr3"></div>
+      <div class="flow-suc" id="fSuc3"></div>
+      <div style="font-size:11px;font-family:var(--font-mono);color:var(--muted);letter-spacing:0.06em;margin-bottom:10px;">6-DIGIT OTP</div>
+      <div class="otp-row" style="margin-bottom:1.25rem;">
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="fo0" oninput="fOtpMove(0)" onkeydown="fOtpBack(event,0)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="fo1" oninput="fOtpMove(1)" onkeydown="fOtpBack(event,1)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="fo2" oninput="fOtpMove(2)" onkeydown="fOtpBack(event,2)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="fo3" oninput="fOtpMove(3)" onkeydown="fOtpBack(event,3)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="fo4" oninput="fOtpMove(4)" onkeydown="fOtpBack(event,4)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="fo5" oninput="fOtpMove(5)" onkeydown="fOtpBack(event,5)"/>
+      </div>
+      <button class="flow-btn" id="fBtn3" onclick="flowStep3Verify()" disabled>Verify & See My Score →</button>
+      <div style="text-align:center;margin-top:1rem;">
+        <span class="timer" id="fTimer" style="font-family:var(--font-mono);font-size:12px;color:var(--hint);">Resend in <span id="fTimerCount">30</span>s</span>
+        <button class="resend-btn" id="fResendBtn" style="display:none" onclick="fResend()">Resend OTP</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase reCAPTCHA container -->
+<div id="recaptcha-container" style="position:fixed;bottom:0;right:0;z-index:0;opacity:0;pointer-events:none;"></div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const firebaseConfig = {
+  apiKey: "AIzaSyB0nHw3UiSm1lezFNP-kKuLX5vqeSHlW7M",
+  authDomain: "atsresume8741.firebaseapp.com",
+  projectId: "atsresume8741",
+  storageBucket: "atsresume8741.firebasestorage.app",
+  messagingSenderId: "788761137123",
+  appId: "1:788761137123:web:f903ebb87cfa2659ab5ad6"
+};
+try {
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  auth.useDeviceLanguage();
+  window._fbAuth = auth;
+  window._RecaptchaVerifier = RecaptchaVerifier;
+  window._signInWithPhoneNumber = signInWithPhoneNumber;
+  window._firebaseReady = true;
+} catch(e) {
+  console.warn('Firebase init failed:', e.message);
+  window._firebaseReady = false;
+}
+</script>
+
+<script>
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let isLoggedIn = sessionStorage.getItem('ats_loggedin') === '1';
+let resumeText = '';
+let flowConfirmation = null;
+let flowTimerInterval = null;
+let currentFlowStep = 1;
+
+// ═══════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if(pg) { pg.classList.add('active'); window.scrollTo(0,0); }
+}
+
+function showHome() {
+  showPage('home');
+}
+
+function goToAnalyze() {
+  showPage('analyze');
+}
+
+// ═══════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════
+function handleFileSelect(e) {
+  const f = e.target.files[0];
+  if(!f) return;
+  document.getElementById('uploadTitle').textContent = f.name;
+  document.getElementById('uploadSub').textContent = (f.size/1024).toFixed(1) + ' KB · Click to change';
+  const r = new FileReader();
+  r.onload = ev => { resumeText = ev.target.result; };
+  r.readAsText(f);
+}
+
+function handleFlowFile(e) {
+  const f = e.target.files[0];
+  if(!f) return;
+  document.getElementById('flowUploadTitle').textContent = f.name;
+  document.getElementById('flowUploadSub').textContent = (f.size/1024).toFixed(1) + ' KB · Click to change';
+  document.getElementById('flowUploadBox').style.borderColor = 'var(--green)';
+  const r = new FileReader();
+  r.onload = ev => { resumeText = ev.target.result; };
+  r.readAsText(f);
+}
+
+// Drag and drop for main upload box
+const ub = document.getElementById('uploadBox');
+if(ub) {
+  ub.addEventListener('dragover', e => { e.preventDefault(); ub.classList.add('dragover'); });
+  ub.addEventListener('dragleave', () => ub.classList.remove('dragover'));
+  ub.addEventListener('drop', e => {
+    e.preventDefault(); ub.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if(f) { document.getElementById('resumeFile').files = e.dataTransfer.files; handleFileSelect({target:{files:[f]}}); }
+  });
+}
+
+// ═══════════════════════════════
+// MAIN ANALYZE ENTRY POINT
+// ═══════════════════════════════
+function startAnalysis() {
+  const errBox = document.getElementById('errorBox');
+  errBox.classList.remove('show');
+
+  if(!resumeText) {
+    // No resume — show flow starting at step 1
+    openFlow(1);
+    return;
+  }
+
+  if(!isLoggedIn) {
+    // Has resume, not logged in — go to phone step
+    openFlow(2);
+    return;
+  }
+
+  // Has resume + logged in — run analysis directly
+  runAnalysis();
+}
+
+// ═══════════════════════════════
+// FLOW OVERLAY
+// ═══════════════════════════════
+function openFlow(step) {
+  document.getElementById('flowOverlay').classList.add('show');
+  showFlowStep(step);
+}
+
+function closeFlow() {
+  document.getElementById('flowOverlay').classList.remove('show');
+  clearInterval(flowTimerInterval);
+}
+
+function showFlowStep(n) {
+  currentFlowStep = n;
+  [1,2,3].forEach(i => {
+    document.getElementById('fStep'+i).style.display = i === n ? '' : 'none';
+    const dot = document.getElementById('fdot'+(i-1));
+    if(dot) dot.className = 'flow-step-dot' + (i < n ? ' done' : i === n ? ' active' : '');
+  });
+}
+
+function flowGoBack(toStep) {
+  clearInterval(flowTimerInterval);
+  showFlowStep(toStep);
+}
+
+// STEP 1 — file upload
+function flowStep1Next() {
+  const err = document.getElementById('fErr1');
+  err.classList.remove('show');
+  if(!resumeText) {
+    err.textContent = 'Please upload your resume first.';
+    err.classList.add('show');
+    return;
+  }
+  if(isLoggedIn) {
+    closeFlow();
+    runAnalysis();
+    return;
+  }
+  showFlowStep(2);
+  setTimeout(() => document.getElementById('fPhone').focus(), 100);
+}
+
+// STEP 2 — phone number
+async function flowStep2SendOtp() {
+  const phone = document.getElementById('fPhone').value.trim();
+  const code = document.getElementById('fCountry').value;
+  const err = document.getElementById('fErr2');
+  const btn = document.getElementById('fBtn2');
+  err.classList.remove('show');
+
+  if(phone.length < 10) { err.textContent = 'Enter a valid 10-digit number.'; err.classList.add('show'); return; }
+  if(!window._fbAuth) { err.textContent = 'Loading Firebase... please wait 2 seconds and try again.'; err.classList.add('show'); return; }
+
+  const fullPhone = code + phone;
+  btn.disabled = true;
+  btn.textContent = 'Sending OTP...';
+
+  try {
+    // Clear old verifier
+    if(window._rcv) { try { window._rcv.clear(); } catch(e){} window._rcv = null; }
+    window._rcv = new window._RecaptchaVerifier(window._fbAuth, 'recaptcha-container', { size:'invisible', callback:()=>{} });
+    flowConfirmation = await window._signInWithPhoneNumber(window._fbAuth, fullPhone, window._rcv);
+
+    // Success — go to OTP step
+    const display = code + ' ' + phone.slice(0,5) + ' ' + phone.slice(5);
+    document.getElementById('fOtpSub').textContent = 'We sent a 6-digit code to ' + display;
+    showFlowStep(3);
+    // Reset OTP boxes
+    for(let i=0;i<6;i++) { const el=document.getElementById('fo'+i); el.value=''; el.classList.remove('filled'); }
+    document.getElementById('fBtn3').disabled = true;
+    document.getElementById('fErr3').classList.remove('show');
+    document.getElementById('fSuc3').classList.remove('show');
+    startFlowTimer();
+    setTimeout(() => document.getElementById('fo0').focus(), 100);
+  } catch(e) {
+    console.error(e);
+    err.textContent = e.code === 'auth/too-many-requests' ? 'Too many attempts. Wait and try again.'
+      : e.code === 'auth/invalid-phone-number' ? 'Invalid phone number. Check and retry.'
+      : 'Failed to send OTP: ' + e.message;
+    err.classList.add('show');
+    if(window._rcv) { try { window._rcv.clear(); } catch(x){} window._rcv = null; }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Send OTP →';
+    document.getElementById('fPhone').value.length >= 10 || (btn.disabled = true);
+  }
+}
+
+// STEP 3 — OTP boxes
+function fOtpMove(i) {
+  const el = document.getElementById('fo'+i);
+  el.value = el.value.replace(/\D/g,'');
+  if(el.value) { el.classList.add('filled'); if(i<5) document.getElementById('fo'+(i+1)).focus(); }
+  else el.classList.remove('filled');
+  let full = true;
+  for(let j=0;j<6;j++) { if(!document.getElementById('fo'+j).value) full=false; }
+  document.getElementById('fBtn3').disabled = !full;
+}
+
+function fOtpBack(e,i) {
+  if(e.key === 'Backspace' && !document.getElementById('fo'+i).value && i>0)
+    document.getElementById('fo'+(i-1)).focus();
+}
+
+async function flowStep3Verify() {
+  const otp = Array.from({length:6}, (_,i) => document.getElementById('fo'+i).value).join('');
+  const err = document.getElementById('fErr3');
+  const suc = document.getElementById('fSuc3');
+  const btn = document.getElementById('fBtn3');
+  err.classList.remove('show'); suc.classList.remove('show');
+
+  if(!flowConfirmation) { err.textContent = 'Session expired. Go back and resend.'; err.classList.add('show'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Verifying...';
+
+  try {
+    await flowConfirmation.confirm(otp);
+    isLoggedIn = true;
+    sessionStorage.setItem('ats_loggedin','1');
+    suc.textContent = '✓ Verified! Running your analysis...';
+    suc.classList.add('show');
+    clearInterval(flowTimerInterval);
+    setTimeout(() => {
+      closeFlow();
+      runAnalysis();
+    }, 800);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Verify & See My Score →';
+    err.textContent = e.code === 'auth/invalid-verification-code' ? 'Wrong OTP. Please try again.'
+      : e.code === 'auth/code-expired' ? 'OTP expired. Go back and resend.'
+      : 'Verification failed. Try again.';
+    err.classList.add('show');
+  }
+}
+
+async function fResend() {
+  document.getElementById('fResendBtn').style.display = 'none';
+  document.getElementById('fErr3').classList.remove('show');
+  for(let i=0;i<6;i++) { const el=document.getElementById('fo'+i); el.value=''; el.classList.remove('filled'); }
+  document.getElementById('fBtn3').disabled = true;
+
+  const phone = document.getElementById('fPhone').value.trim();
+  const code = document.getElementById('fCountry').value;
+  try {
+    if(window._rcv) { try { window._rcv.clear(); } catch(e){} window._rcv = null; }
+    window._rcv = new window._RecaptchaVerifier(window._fbAuth,'recaptcha-container',{size:'invisible',callback:()=>{}});
+    flowConfirmation = await window._signInWithPhoneNumber(window._fbAuth, code+phone, window._rcv);
+    const suc = document.getElementById('fSuc3');
+    suc.textContent = 'New OTP sent!'; suc.classList.add('show');
+    setTimeout(() => suc.classList.remove('show'), 3000);
+    startFlowTimer();
+    document.getElementById('fo0').focus();
+  } catch(e) {
+    document.getElementById('fErr3').textContent = 'Failed to resend: ' + e.message;
+    document.getElementById('fErr3').classList.add('show');
+    document.getElementById('fResendBtn').style.display = 'inline-block';
+  }
+}
+
+function startFlowTimer() {
+  clearInterval(flowTimerInterval);
+  let count = 30;
+  document.getElementById('fTimerCount').textContent = count;
+  document.getElementById('fTimer').style.display = '';
+  document.getElementById('fResendBtn').style.display = 'none';
+  flowTimerInterval = setInterval(() => {
+    count--;
+    document.getElementById('fTimerCount').textContent = count;
+    if(count <= 0) {
+      clearInterval(flowTimerInterval);
+      document.getElementById('fTimer').style.display = 'none';
+      document.getElementById('fResendBtn').style.display = 'inline-block';
+    }
+  }, 1000);
+}
+
+// Close overlay on backdrop click
+document.getElementById('flowOverlay').addEventListener('click', function(e) {
+  if(e.target === this) closeFlow();
+});
+
+// ═══════════════════════════════
+// LOADER
+// ═══════════════════════════════
+const loaderSteps = ['Parsing resume structure','Extracting keywords','Mapping skills to JD','Scoring experience relevance','Detecting impact metrics','Checking ATS formatting','Generating recruiter insights'];
+
+function animateLoader() {
+  let i = 0;
+  return new Promise(res => {
+    const tick = () => {
+      if(i > 0) {
+        const prev = document.getElementById('lstep-'+(i-1));
+        if(prev) { prev.querySelector('.l-ico').textContent='✅'; prev.classList.remove('active'); prev.classList.add('done'); }
+      }
+      if(i >= loaderSteps.length) { res(); return; }
+      const cur = document.getElementById('lstep-'+i);
+      if(cur) { cur.querySelector('.l-ico').textContent='⚡'; cur.classList.add('active'); }
+      document.getElementById('loaderStep').textContent = loaderSteps[i]+'...';
+      i++;
+      setTimeout(tick, 1000 + Math.random()*600);
+    };
+    tick();
+  });
+}
+
+// ═══════════════════════════════
+// RUN ANALYSIS
+// ═══════════════════════════════
+async function runAnalysis() {
+  const jd = document.getElementById('jdInput').value.trim();
+  const errBox = document.getElementById('errorBox');
+  errBox.classList.remove('show');
+
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('analyze-form-section').style.display = 'none';
+  document.getElementById('loaderSection').classList.add('show');
+  document.getElementById('resultsSection').classList.remove('show');
+
+  // Reset loader steps
+  for(let i=0;i<7;i++) {
+    const el = document.getElementById('lstep-'+i);
+    if(el) { el.className=''; el.querySelector('.l-ico').textContent='⏳'; }
+  }
+
+  const loaderPromise = animateLoader();
+
+  let data;
+  try {
+    const resp = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText, jd })
+    });
+    if(!resp.ok) { const e=await resp.json(); throw new Error(e.error||'Server error '+resp.status); }
+    data = await resp.json();
+  } catch(err) {
+    await loaderPromise;
+    document.getElementById('loaderSection').classList.remove('show');
+    document.getElementById('analyze-form-section').style.display = '';
+    document.getElementById('analyzeBtn').disabled = false;
+    errBox.textContent = 'Analysis failed: ' + err.message;
+    errBox.classList.add('show');
+    return;
+  }
+
+  await loaderPromise;
+  document.getElementById('loaderSection').classList.remove('show');
+  renderResults(data, jd);
+}
+
+// ═══════════════════════════════
+// NEW SCAN
+// ═══════════════════════════════
+function newScan() {
+  document.getElementById('resultsSection').classList.remove('show');
+  document.getElementById('analyze-form-section').style.display = '';
+  document.getElementById('analyzeBtn').disabled = false;
+  resumeText = '';
+  document.getElementById('uploadTitle').textContent = 'Upload Resume';
+  document.getElementById('uploadSub').textContent = 'PDF, DOCX or TXT · max 5MB';
+  document.getElementById('jdInput').value = '';
+  document.getElementById('errorBox').classList.remove('show');
+  for(let i=0;i<7;i++) {
+    const el = document.getElementById('lstep-'+i);
+    if(el) { el.className=''; el.querySelector('.l-ico').textContent='⏳'; }
+  }
+  window.scrollTo(0,0);
+}
+
+function exportReport() { window.print(); }
+
+// ═══════════════════════════════
+// SAMPLE REPORT
+// ═══════════════════════════════
+function showSampleReport() {
+  const sampleData = {
+    overallScore:74, atsScore:79, recruiterScore:68,
+    interviewProbability:'42%', resumeStrength:'B',
+    keywordAnalysis:{
+      score:72, totalFound:26, totalInJD:38, coveragePct:'68%',
+      matchedKeywords:['React','Node.js','TypeScript','PostgreSQL','REST API','Git','Agile','CI/CD'],
+      partialKeywords:['AWS','Microservices','GraphQL'],
+      criticalMissing:['Kubernetes','Docker','System Design','Tech Lead','Architecture'],
+      byCategory:[{name:'Technical Skills',pct:82},{name:'Soft Skills',pct:58},{name:'Domain Terms',pct:70},{name:'Role-Specific',pct:44}]
+    },
+    skillsRadar:{score:70,resume:[85,42,65,60,35,78],required:[90,80,75,80,75,85],labels:['Technical','Leadership','Communication','Domain','Architecture','Delivery']},
+    experienceAnalysis:{score:72,strengths:['5+ years of consistent full-stack experience','Strong ownership of frontend projects','Measurable impact in previous roles'],gaps:['No evidence of leading a team','Missing cloud infrastructure ownership']},
+    impactAnalysis:{score:68,items:[{label:'API Latency',value:40},{label:'Retention',value:15},{label:'Cost Cut',value:20},{label:'Page Load',value:35}]},
+    formattingAnalysis:{score:55,checks:[
+      {name:'Headers',status:'green',desc:'Standard section labels detected.'},
+      {name:'Section Order',status:'green',desc:'Logical flow maintained.'},
+      {name:'Tables/Columns',status:'red',desc:'Two-column layout will break ATS parsing.'},
+      {name:'Images/Icons',status:'red',desc:'Profile photo detected — remove immediately.'},
+      {name:'Fonts',status:'green',desc:'Standard font, no embed issues.'}
+    ]},
+    sectionScores:[{label:'Summary',score:80},{label:'Experience',score:74},{label:'Projects',score:68},{label:'Skills',score:85},{label:'Education',score:90},{label:'Formatting',score:52},{label:'Certs',score:0}],
+    recruiterFeedback:{
+      likes:'Strong technical foundation with measurable impact. API latency improvement tied to retention is exactly what hiring managers want to see.',
+      questions:'Zero evidence of team leadership. No cloud certifications for a senior role. Resume lacks a clear specialization narrative.',
+      topAchievement:'Reduced API latency by 40ms improving retention 15% — rare to see technical and business impact linked.',
+      biggestRisk:'Two-column layout will scramble ATS parsing. Profile photo must be removed.'
+    },
+    recommendations:{
+      high:['Remove two-column layout and profile photo immediately.','Add Kubernetes, Docker, System Design, Tech Lead keywords — completely absent.'],
+      medium:['Add team mentoring and architecture decision bullets.','Mention cloud infrastructure in project descriptions.'],
+      low:['Add a Certifications section — even in-progress certs help.']
+    }
+  };
+  showPage('analyze');
+  document.getElementById('analyze-form-section').style.display = 'none';
+  document.getElementById('loaderSection').classList.remove('show');
+  renderResults(sampleData, 'Sample — Senior Software Engineer');
+}
+
+// ═══════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════
+function scoreColor(s){ return s>=80?'var(--green)':s>=60?'var(--orange)':'var(--red)'; }
+function verdict(s){ return s>=90?'Strong Match':s>=80?'Competitive':s>=70?'Interview Possible':s>=60?'Significant Gaps':'Unlikely to Pass'; }
+
+function renderResults(d, jd) {
+  const score = d.overallScore || 0;
+  const arc = document.getElementById('gaugeArc');
+  const offset = Math.round(327-(327*(score/100)));
+  arc.style.stroke = scoreColor(score);
+  setTimeout(() => { arc.style.strokeDashoffset = offset; }, 100);
+  document.getElementById('gaugeScore').textContent = score;
+  document.getElementById('gaugeScore').style.color = scoreColor(score);
+  document.getElementById('gaugeVerdict').textContent = verdict(score);
+  document.getElementById('gaugeVerdict').style.color = scoreColor(score);
+  document.getElementById('resultsMeta').textContent = 'Analyzed '+new Date().toLocaleString()+' · Score: '+score+'/100';
+
+  document.getElementById('mAts').textContent = d.atsScore||'—';
+  document.getElementById('mAts').style.color = scoreColor(d.atsScore);
+  document.getElementById('mRec').textContent = d.recruiterScore||'—';
+  document.getElementById('mRec').style.color = scoreColor(d.recruiterScore);
+  document.getElementById('mProb').textContent = d.interviewProbability||'—';
+  document.getElementById('mStrength').textContent = d.resumeStrength||'—';
+
+  const kw = d.keywordAnalysis||{};
+  document.getElementById('kwFound').textContent = kw.totalFound||0;
+  document.getElementById('kwMissing').textContent = (kw.missingKeywords||[]).length;
+  document.getElementById('kwCritical').textContent = (kw.criticalMissing||[]).length;
+  document.getElementById('kwCoverage').textContent = kw.coveragePct||'0%';
+
+  const mc = document.getElementById('matchedChips'); mc.innerHTML='';
+  (kw.matchedKeywords||[]).slice(0,15).forEach(k=>{ const s=document.createElement('span');s.className='chip g';s.textContent=k;mc.appendChild(s); });
+  const pc = document.getElementById('partialChips'); pc.innerHTML='';
+  (kw.partialKeywords||[]).slice(0,8).forEach(k=>{ const s=document.createElement('span');s.className='chip o';s.textContent=k;pc.appendChild(s); });
+  const mc2 = document.getElementById('missingChips'); mc2.innerHTML='';
+  (kw.criticalMissing||[]).forEach(k=>{ const s=document.createElement('span');s.className='chip r';s.textContent=k;mc2.appendChild(s); });
+
+  const pr = document.getElementById('kwProgressRows'); pr.innerHTML='';
+  (kw.byCategory||[]).forEach(c=>{
+    pr.innerHTML+=`<div class="prog-row"><span class="prog-name">${c.name}</span><div class="prog-track"><div class="prog-fill" style="width:${c.pct}%;background:${c.pct>=75?'var(--green)':c.pct>=50?'var(--orange)':'var(--red)'};"></div></div><span class="prog-val">${c.pct}%</span></div>`;
+  });
+
+  const sr = d.skillsRadar||{resume:[75,55,70,65,50,80],required:[90,80,75,80,75,85],labels:['Technical','Leadership','Communication','Domain','Architecture','Delivery']};
+  const rc2 = document.getElementById('radarChart2');
+  if(window._radarChart){window._radarChart.destroy();}
+  window._radarChart = new Chart(rc2,{
+    type:'radar',
+    data:{labels:sr.labels,datasets:[
+      {label:'Resume',data:sr.resume,backgroundColor:'rgba(61,126,255,0.15)',borderColor:'#3D7EFF',borderWidth:1.5,pointRadius:3,pointBackgroundColor:'#3D7EFF'},
+      {label:'JD Required',data:sr.required,backgroundColor:'rgba(245,166,35,0.08)',borderColor:'rgba(245,166,35,0.6)',borderWidth:1.5,borderDash:[4,3],pointRadius:2,pointBackgroundColor:'rgba(245,166,35,0.6)'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:100,ticks:{stepSize:25,display:false},grid:{color:'rgba(255,255,255,0.06)'},angleLines:{color:'rgba(255,255,255,0.06)'},pointLabels:{font:{size:10},color:'rgba(255,255,255,0.45)'}}}}
+  });
+
+  const ia = d.impactAnalysis||{};
+  const items = (ia.items||[{label:'No metrics',value:0}]).slice(0,6);
+  const ic2 = document.getElementById('impactChart2');
+  if(window._impactChart){window._impactChart.destroy();}
+  window._impactChart = new Chart(ic2,{
+    type:'bar',
+    data:{labels:items.map(i=>i.label),datasets:[{label:'Value',data:items.map(i=>i.value),backgroundColor:'rgba(61,126,255,0.65)',borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'rgba(255,255,255,0.4)'}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{font:{size:10},color:'rgba(255,255,255,0.4)'},beginAtZero:true}}}
+  });
+
+  const tg = document.getElementById('trafficGrid'); tg.innerHTML='';
+  const fa = d.formattingAnalysis||{};
+  (fa.checks||[]).forEach(c=>{
+    tg.innerHTML+=`<div class="tl-card"><div class="tl-dot ${c.status==='green'?'g':c.status==='orange'?'o':'r'}"></div><div class="tl-name">${c.name}</div><div class="tl-desc">${c.desc}</div></div>`;
+  });
+
+  const sc = document.getElementById('sectionScoreCards'); sc.innerHTML='';
+  (d.sectionScores||[]).forEach(s=>{
+    sc.innerHTML+=`<div class="sc"><div class="sc-label">${s.label.toUpperCase()}</div><div class="sc-val" style="color:${scoreColor(s.score)}">${s.score||'—'}</div><div class="sc-bar" style="background:${scoreColor(s.score)};width:${s.score||0}%"></div></div>`;
+  });
+
+  const rf = d.recruiterFeedback||{};
+  const feedbacks=[
+    {ico:'👍',label:'What recruiters will like',color:'var(--green)',key:'likes'},
+    {ico:'🤔',label:'What they will question',color:'var(--orange)',key:'questions'},
+    {ico:'🏆',label:'Most impressive achievement',color:'var(--accent)',key:'topAchievement'},
+    {ico:'⚠',label:'Biggest resume risk',color:'var(--red)',key:'biggestRisk'}
+  ];
+  const rfEl = document.getElementById('recruiterFeedback'); rfEl.innerHTML='';
+  feedbacks.forEach(f=>{
+    rfEl.innerHTML+=`<div class="fb"><div class="fb-head" style="color:${f.color}"><span class="fb-ico">${f.ico}</span>${f.label}</div><div class="fb-body">${rf[f.key]||'—'}</div></div>`;
+  });
+
+  const recs = d.recommendations||{};
+  const rl = document.getElementById('recList'); rl.innerHTML='';
+  (recs.high||[]).forEach(r=>{ rl.innerHTML+=`<div class="rec-item high"><span class="rec-badge high">HIGH</span><div class="rec-text">${r}</div></div>`; });
+  (recs.medium||[]).forEach(r=>{ rl.innerHTML+=`<div class="rec-item med"><span class="rec-badge med">MEDIUM</span><div class="rec-text">${r}</div></div>`; });
+  (recs.low||[]).forEach(r=>{ rl.innerHTML+=`<div class="rec-item low"><span class="rec-badge low">LOW</span><div class="rec-text">${r}</div></div>`; });
+
+  document.getElementById('resultsSection').classList.add('show');
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════
+// FEATURES TAB
+// ═══════════════════════════════
+function switchFeat(i){
+  document.querySelectorAll('.feat-nav-item').forEach((el,j) => el.classList.toggle('active', j===i));
+  document.querySelectorAll('.feat-panel').forEach((el,j) => el.classList.toggle('active', j===i));
+}
+
+function checkApiKeyStatus(){}
+</script>
 
 </body>
 </html>
