@@ -396,7 +396,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
     </p>
     <div class="hero-actions">
       <button class="btn-lg btn-lg-primary" onclick="showPage('analyze')">Analyze My Resume →</button>
-      <button class="btn-lg btn-lg-ghost">See a sample report</button>
+      <button class="btn-lg btn-lg-ghost" onclick="showSampleReport()">See a sample report</button>
     </div>
     <div class="hero-stats">
       <div class="hero-stat">
@@ -651,6 +651,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
 </div>
 
 <!-- ===== LOGIN PAGE ===== -->
+<!-- ===== LOGIN PAGE (Sign in from nav) ===== -->
 <div id="page-login" class="page" style="padding-top:0">
   <div class="auth-page">
     <div class="auth-grid-bg"></div>
@@ -661,13 +662,13 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
         ATS Intelligence
       </div>
       <h1 class="auth-title">Welcome back</h1>
-      <p class="auth-sub">Enter your mobile number to sign in or create a free account. We'll send you a one-time code.</p>
+      <p class="auth-sub">Enter your mobile number to sign in or create a free account. We'll send a one-time code.</p>
 
-      <div class="auth-error" id="loginError"></div>
+      <div class="auth-error" id="loginPageError"></div>
 
       <div class="auth-field-label">MOBILE NUMBER</div>
-      <div class="auth-phone-row" id="phoneRow">
-        <select class="auth-country" id="countryCode">
+      <div class="auth-phone-row">
+        <select class="auth-country" id="loginPageCountry">
           <option value="+91">🇮🇳 +91</option>
           <option value="+1">🇺🇸 +1</option>
           <option value="+44">🇬🇧 +44</option>
@@ -675,17 +676,12 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
           <option value="+65">🇸🇬 +65</option>
           <option value="+61">🇦🇺 +61</option>
         </select>
-        <input class="auth-phone-input" type="tel" id="phoneInput" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'');validatePhone()"/>
+        <input class="auth-phone-input" type="tel" id="loginPagePhone" placeholder="98765 43210" maxlength="10" inputmode="numeric"
+          oninput="this.value=this.value.replace(/\D/g,'');document.getElementById('loginPageSendBtn').disabled=this.value.length<10"/>
       </div>
+      <button class="auth-btn" id="loginPageSendBtn" onclick="loginPageSendOtp()" disabled>Send OTP →</button>
 
-      <button class="auth-btn" id="sendOtpBtn" onclick="sendOtp()" disabled>Send OTP →</button>
-
-      <div class="auth-divider">or continue with</div>
-      <button class="auth-btn" style="background:var(--bg3);color:var(--text);border:1px solid var(--border2);margin-bottom:0;" onclick="showGoogleNote()">
-        <span style="margin-right:8px">G</span> Continue with Google
-      </button>
-
-      <div class="trust-badges">
+      <div class="trust-badges" style="margin-top:1.25rem">
         <span class="trust-badge">🔒 No password needed</span>
         <span class="trust-badge">⚡ 30-second setup</span>
         <span class="trust-badge">🆓 Free to start</span>
@@ -695,7 +691,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
   </div>
 </div>
 
-<!-- ===== OTP PAGE ===== -->
+<!-- ===== OTP PAGE (Sign in from nav) ===== -->
 <div id="page-otp" class="page" style="padding-top:0">
   <div class="auth-page">
     <div class="auth-grid-bg"></div>
@@ -708,28 +704,26 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
       <button class="auth-back" onclick="showPage('login')">← Back</button>
       <h1 class="auth-title">Check your phone</h1>
       <p class="auth-sub">We sent a 6-digit code to</p>
-      <div class="otp-phone-display">📱 <span id="otpPhoneDisplay">+91 98765 43210</span> · <a href="#" onclick="showPage('login');return false;" style="color:var(--accent);text-decoration:none;font-size:12px;">Change</a></div>
+      <div class="otp-phone-display" id="loginPagePhoneDisplay">📱 —</div>
 
-      <div class="auth-error" id="otpError"></div>
-      <div class="auth-success" id="otpSuccess"></div>
+      <div class="auth-error" id="loginPageOtpError"></div>
+      <div class="auth-success" id="loginPageOtpSuccess"></div>
 
       <div class="auth-field-label">ENTER 6-DIGIT OTP</div>
       <div class="otp-row">
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="o0" oninput="otpMove(0)" onkeydown="otpBack(event,0)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="o1" oninput="otpMove(1)" onkeydown="otpBack(event,1)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="o2" oninput="otpMove(2)" onkeydown="otpBack(event,2)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="o3" oninput="otpMove(3)" onkeydown="otpBack(event,3)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="o4" oninput="otpMove(4)" onkeydown="otpBack(event,4)"/>
-        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="o5" oninput="otpMove(5)" onkeydown="otpBack(event,5)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp0" oninput="loginPageOtpMove(0)" onkeydown="loginPageOtpBack(event,0)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp1" oninput="loginPageOtpMove(1)" onkeydown="loginPageOtpBack(event,1)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp2" oninput="loginPageOtpMove(2)" onkeydown="loginPageOtpBack(event,2)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp3" oninput="loginPageOtpMove(3)" onkeydown="loginPageOtpBack(event,3)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp4" oninput="loginPageOtpMove(4)" onkeydown="loginPageOtpBack(event,4)"/>
+        <input class="otp-input" type="text" maxlength="1" inputmode="numeric" id="lp5" oninput="loginPageOtpMove(5)" onkeydown="loginPageOtpBack(event,5)"/>
       </div>
+      <button class="auth-btn" id="loginPageVerifyBtn" onclick="loginPageVerifyOtp()" disabled>Verify & Continue →</button>
 
-      <button class="auth-btn" id="verifyOtpBtn" onclick="verifyOtp()" disabled>Verify & Continue →</button>
-
-      <div class="resend-row">
-        <span class="timer" id="otpTimer">Resend in <span id="timerCount">30</span>s</span>
-        <button class="resend-btn" id="resendBtn" style="display:none" onclick="resendOtp()">Resend OTP</button>
+      <div class="resend-row" style="margin-top:1rem;">
+        <span class="timer" id="loginPageTimer">Resend in <span id="loginPageTimerCount">30</span>s</span>
+        <button class="resend-btn" id="loginPageResendBtn" style="display:none" onclick="loginPageResend()">Resend OTP</button>
       </div>
-
       <div class="trust-badges" style="margin-top:1.25rem">
         <span class="trust-badge">🔐 OTP expires in 10 min</span>
         <span class="trust-badge">✅ Secure login</span>
@@ -769,8 +763,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
         <span class="trust-badge">⚡ 20 seconds</span>
         <span class="trust-badge">🆓 Free forever</span>
       </div>
-      <div id="recaptcha-container"></div>
-    </div>
+
 
     <!-- Step 2: OTP -->
     <div id="modalStepOtp" style="display:none;">
@@ -1178,7 +1171,11 @@ function startModalOtpTimer(){
   },1000);
 }
 
-function checkApiKeyStatus(){} // no-op — key lives on the server
+// ─── API KEY ───
+// ── Paste your Anthropic API key here ──────────────────────────────
+const ANTHROPIC_KEY = 'YOUR_API_KEY_HERE';
+// ───────────────────────────────────────────────────────────────────
+function checkApiKeyStatus(){} // no-op, key is hardcoded
 
 // ─── FILE HANDLING ───
 let resumeText = '';
@@ -1253,22 +1250,121 @@ async function runAnalysis(){
 
   const loaderPromise = animateLoader();
 
+  const prompt = `You are an elite ATS and recruiter evaluation engine. Analyze this resume using strict recruiter-grade logic. Score conservatively — do NOT inflate scores.
+
+RESUME TEXT:
+"""
+${resumeText.slice(0,6000)}
+"""
+
+JOB DESCRIPTION:
+"""
+${jd ? jd.slice(0,3000) : 'No job description provided. Perform a general resume quality analysis across all dimensions based on the resume content alone. Infer the likely target role from the resume and score accordingly.'}
+"""
+
+SCORING WEIGHTS:
+- Keyword Match: 25%
+- Skills Match: 15%
+- Experience Relevance: 20%
+- Impact Metrics: 10%
+- Projects Match: 10%
+- Education: 5%
+- ATS Formatting: 5%
+- Recruiter Readability: 5%
+- Leadership Signals: 5%
+
+SCORE SCALE: 100=Exceptional, 90-99=Strong, 80-89=Competitive, 70-79=Interview Possible, 60-69=Significant Gaps, <60=Unlikely to Pass ATS
+
+Return ONLY valid JSON in exactly this structure (no markdown, no extra text):
+{
+  "overallScore": 0,
+  "atsScore": 0,
+  "recruiterScore": 0,
+  "interviewProbability": "48%",
+  "resumeStrength": "B+",
+  "keywordAnalysis": {
+    "score": 0,
+    "totalFound": 0,
+    "totalInJD": 0,
+    "coveragePct": "0%",
+    "matchedKeywords": [],
+    "partialKeywords": [],
+    "missingKeywords": [],
+    "criticalMissing": [],
+    "byCategory": [
+      {"name": "Technical Skills", "pct": 0},
+      {"name": "Soft Skills", "pct": 0},
+      {"name": "Domain Terms", "pct": 0},
+      {"name": "Role-Specific", "pct": 0}
+    ]
+  },
+  "skillsRadar": {
+    "score": 0,
+    "resume": [0,0,0,0,0,0],
+    "required": [0,0,0,0,0,0],
+    "labels": ["Technical","Leadership","Communication","Domain","Architecture","Delivery"]
+  },
+  "experienceAnalysis": {
+    "score": 0,
+    "strengths": [],
+    "gaps": []
+  },
+  "impactAnalysis": {
+    "score": 0,
+    "items": [
+      {"label": "Example Impact", "value": 0}
+    ]
+  },
+  "formattingAnalysis": {
+    "score": 0,
+    "checks": [
+      {"name": "Headers", "status": "green", "desc": ""},
+      {"name": "Section Order", "status": "green", "desc": ""},
+      {"name": "Tables/Columns", "status": "orange", "desc": ""},
+      {"name": "Images/Icons", "status": "green", "desc": ""},
+      {"name": "Fonts", "status": "green", "desc": ""}
+    ]
+  },
+  "sectionScores": [
+    {"label": "Summary", "score": 0},
+    {"label": "Experience", "score": 0},
+    {"label": "Projects", "score": 0},
+    {"label": "Skills", "score": 0},
+    {"label": "Education", "score": 0},
+    {"label": "Formatting", "score": 0},
+    {"label": "Certs", "score": 0}
+  ],
+  "recruiterFeedback": {
+    "likes": "",
+    "questions": "",
+    "topAchievement": "",
+    "biggestRisk": ""
+  },
+  "recommendations": {
+    "high": [],
+    "medium": [],
+    "low": []
+  }
+}`;
+
   let data;
   try {
-    const resp = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resumeText, jd })
+    const resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,messages:[{role:'user',content:prompt}]})
     });
-    if(!resp.ok){ const e=await resp.json(); throw new Error(e.error||'Server error '+resp.status); }
-    data = await resp.json();
+    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'API error '+resp.status);}
+    const j=await resp.json();
+    const raw=j.content[0].text;
+    const cleaned=raw.replace(/```json|```/g,'').trim();
+    data=JSON.parse(cleaned);
   } catch(err){
     await loaderPromise;
     document.getElementById('loaderSection').classList.remove('show');
     document.getElementById('analyze-form-section').style.display='';
     document.getElementById('analyzeBtn').disabled=false;
-    errBox.textContent='Analysis failed: '+err.message;
-    errBox.classList.add('show');
+    errBox.textContent='Analysis failed: '+err.message;errBox.classList.add('show');
     return;
   }
 
@@ -1415,8 +1511,159 @@ function newScan(){
 // ─── EXPORT (print to PDF) ───
 function exportReport(){window.print();}
 
-// ─── INIT ───
+// ─── LOGIN PAGE (nav Sign in) ───
+let loginPageConfirmation = null;
+let loginPageTimerInterval = null;
+
+async function loginPageSendOtp(){
+  const phone = document.getElementById('loginPagePhone').value.trim();
+  const code = document.getElementById('loginPageCountry').value;
+  const err = document.getElementById('loginPageError');
+  const btn = document.getElementById('loginPageSendBtn');
+  err.classList.remove('show');
+  if(phone.length<10){err.textContent='Enter a valid 10-digit number.';err.classList.add('show');return;}
+
+  const fullPhone = code + phone;
+  btn.disabled=true; btn.textContent='Sending...';
+
+  try {
+    if(!window.loginRecaptchaVerifier){
+      window.loginRecaptchaVerifier = new window._RecaptchaVerifier(window._fbAuth,'recaptcha-container',{size:'invisible',callback:()=>{}});
+    }
+    loginPageConfirmation = await window._signInWithPhoneNumber(window._fbAuth, fullPhone, window.loginRecaptchaVerifier);
+    const display = code+' '+phone.slice(0,5)+' '+phone.slice(5);
+    document.getElementById('loginPagePhoneDisplay').innerHTML='📱 <strong>'+display+'</strong>';
+    showPage('otp');
+    startLoginPageTimer();
+    setTimeout(()=>document.getElementById('lp0').focus(),200);
+  } catch(e){
+    err.textContent = e.code==='auth/too-many-requests' ? 'Too many attempts. Please try again later.'
+      : e.code==='auth/invalid-phone-number' ? 'Invalid phone number.'
+      : 'Failed to send OTP: '+e.message;
+    err.classList.add('show');
+    if(window.loginRecaptchaVerifier){window.loginRecaptchaVerifier.clear();window.loginRecaptchaVerifier=null;}
+  } finally { btn.disabled=false; btn.textContent='Send OTP →'; }
+}
+
+function loginPageOtpMove(i){
+  const el=document.getElementById('lp'+i);
+  el.value=el.value.replace(/\D/g,'');
+  if(el.value){el.classList.add('filled');if(i<5)document.getElementById('lp'+(i+1)).focus();}
+  else el.classList.remove('filled');
+  let full=true;
+  for(let j=0;j<6;j++){if(!document.getElementById('lp'+j).value)full=false;}
+  document.getElementById('loginPageVerifyBtn').disabled=!full;
+}
+
+function loginPageOtpBack(e,i){
+  if(e.key==='Backspace'&&!document.getElementById('lp'+i).value&&i>0)
+    document.getElementById('lp'+(i-1)).focus();
+}
+
+async function loginPageVerifyOtp(){
+  const otp=Array.from({length:6},(_,i)=>document.getElementById('lp'+i).value).join('');
+  const err=document.getElementById('loginPageOtpError');
+  const suc=document.getElementById('loginPageOtpSuccess');
+  const btn=document.getElementById('loginPageVerifyBtn');
+  err.classList.remove('show'); suc.classList.remove('show');
+  if(!loginPageConfirmation){err.textContent='Session expired. Go back and resend.';err.classList.add('show');return;}
+  btn.disabled=true; btn.textContent='Verifying...';
+  try {
+    await loginPageConfirmation.confirm(otp);
+    isLoggedIn=true; sessionStorage.setItem('ats_loggedin','1');
+    suc.textContent='✓ Signed in! Taking you to the analyzer...';
+    suc.classList.add('show');
+    clearInterval(loginPageTimerInterval);
+    setTimeout(()=>showPage('analyze'), 900);
+  } catch(e){
+    btn.disabled=false; btn.textContent='Verify & Continue →';
+    err.textContent = e.code==='auth/invalid-verification-code' ? 'Incorrect OTP. Try again.'
+      : e.code==='auth/code-expired' ? 'OTP expired. Please resend.'
+      : 'Verification failed. Try again.';
+    err.classList.add('show');
+  }
+}
+
+async function loginPageResend(){
+  document.getElementById('loginPageResendBtn').style.display='none';
+  for(let i=0;i<6;i++){const el=document.getElementById('lp'+i);el.value='';el.classList.remove('filled');}
+  document.getElementById('loginPageVerifyBtn').disabled=true;
+  try {
+    if(window.loginRecaptchaVerifier){window.loginRecaptchaVerifier.clear();window.loginRecaptchaVerifier=null;}
+    const phone=document.getElementById('loginPagePhone').value.trim();
+    const code=document.getElementById('loginPageCountry').value;
+    window.loginRecaptchaVerifier=new window._RecaptchaVerifier(window._fbAuth,'recaptcha-container',{size:'invisible',callback:()=>{}});
+    loginPageConfirmation=await window._signInWithPhoneNumber(window._fbAuth,code+phone,window.loginRecaptchaVerifier);
+    const suc=document.getElementById('loginPageOtpSuccess');
+    suc.textContent='New OTP sent!'; suc.classList.add('show');
+    setTimeout(()=>suc.classList.remove('show'),3000);
+    startLoginPageTimer();
+    document.getElementById('lp0').focus();
+  } catch(e){
+    document.getElementById('loginPageResendBtn').style.display='inline-block';
+    document.getElementById('loginPageOtpError').textContent='Failed to resend. Try again.';
+    document.getElementById('loginPageOtpError').classList.add('show');
+  }
+}
+
+function startLoginPageTimer(){
+  clearInterval(loginPageTimerInterval);
+  let count=30;
+  document.getElementById('loginPageTimerCount').textContent=count;
+  document.getElementById('loginPageTimer').style.display='';
+  document.getElementById('loginPageResendBtn').style.display='none';
+  loginPageTimerInterval=setInterval(()=>{
+    count--;
+    document.getElementById('loginPageTimerCount').textContent=count;
+    if(count<=0){
+      clearInterval(loginPageTimerInterval);
+      document.getElementById('loginPageTimer').style.display='none';
+      document.getElementById('loginPageResendBtn').style.display='inline-block';
+    }
+  },1000);
+}
+
+// ─── SAMPLE REPORT ───
+function showSampleReport(){
+  const sampleData = {
+    overallScore:74, atsScore:79, recruiterScore:68,
+    interviewProbability:'42%', resumeStrength:'B',
+    keywordAnalysis:{
+      score:72, totalFound:26, totalInJD:38, coveragePct:'68%',
+      matchedKeywords:['React','Node.js','TypeScript','PostgreSQL','REST API','Git','Agile','CI/CD'],
+      partialKeywords:['AWS','Microservices','GraphQL'],
+      criticalMissing:['Kubernetes','Docker','System Design','Tech Lead','Architecture'],
+      byCategory:[{name:'Technical Skills',pct:82},{name:'Soft Skills',pct:58},{name:'Domain Terms',pct:70},{name:'Role-Specific',pct:44}]
+    },
+    skillsRadar:{score:70,resume:[85,42,65,60,35,78],required:[90,80,75,80,75,85],labels:['Technical','Leadership','Communication','Domain','Architecture','Delivery']},
+    experienceAnalysis:{score:72,strengths:['5+ years of consistent full-stack experience','Strong ownership of frontend projects','Measurable impact in previous roles'],gaps:['No evidence of leading a team','Missing cloud infrastructure ownership','No architectural decision records']},
+    impactAnalysis:{score:68,items:[{label:'API Latency',value:40},{label:'User Retention',value:15},{label:'Cost Reduction',value:20},{label:'Page Load',value:35}]},
+    formattingAnalysis:{score:55,checks:[{name:'Headers',status:'green',desc:'Standard section labels detected.'},{name:'Section Order',status:'green',desc:'Logical flow maintained.'},{name:'Tables/Columns',status:'red',desc:'Two-column layout will break ATS parsing.'},{name:'Images/Icons',status:'red',desc:'Profile photo detected — remove immediately.'},{name:'Fonts',status:'green',desc:'Standard font, no embed issues.'}]},
+    sectionScores:[{label:'Summary',score:80},{label:'Experience',score:74},{label:'Projects',score:68},{label:'Skills',score:85},{label:'Education',score:90},{label:'Formatting',score:52},{label:'Certs',score:0}],
+    recruiterFeedback:{
+      likes:'Strong technical foundation with measurable impact. The API latency improvement tied to retention is exactly what hiring managers want to see. Consistent career progression.',
+      questions:'Zero evidence of team leadership or architectural ownership. No cloud certifications for a senior role. Resume lacks a clear specialization narrative.',
+      topAchievement:'Reduced API response latency by 40ms through query optimization, directly improving user retention by 15% — rare to see technical and business impact linked.',
+      biggestRisk:'Two-column layout will scramble ATS parsing. Profile photo must be removed. These formatting issues alone can auto-reject an otherwise strong candidate.'
+    },
+    recommendations:{
+      high:['Remove two-column layout and profile photo — convert to single-column ATS-safe format immediately.','Add Kubernetes, Docker, System Design, and Tech Lead keywords — these 5 are critical and completely absent.'],
+      medium:['Add leadership signals — bullets showing team mentoring, architecture decisions, or cross-functional ownership.','Reframe project descriptions to mention cloud infrastructure even if used peripherally.'],
+      low:['Add a Certifications section — even in-progress AWS or CKA certs signal intent and close credibility gaps.']
+    }
+  };
+  isLoggedIn=true;
+  showPage('analyze');
+  setTimeout(()=>{
+    document.getElementById('analyze-form-section').style.display='none';
+    document.getElementById('loaderSection').classList.remove('show');
+    renderResults(sampleData,'Sample Job Description — Senior Software Engineer');
+  },100);
+}
 </script>
+
+<!-- Firebase invisible reCAPTCHA — required for Phone Auth, do not remove -->
+<div id="recaptcha-container" style="position:fixed;bottom:0;right:0;z-index:0;opacity:0;pointer-events:none;"></div>
 
 </body>
 </html>
