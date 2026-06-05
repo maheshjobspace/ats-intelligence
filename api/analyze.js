@@ -107,7 +107,7 @@ CRITICAL: Return ONLY a raw JSON object. No markdown. No backticks. No code fenc
 
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -116,8 +116,7 @@ CRITICAL: Return ONLY a raw JSON object. No markdown. No backticks. No code fenc
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           temperature: 0.1,
-          maxOutputTokens: 4000,
-          responseMimeType: 'application/json'
+          maxOutputTokens: 4000
         }
       })
     });
