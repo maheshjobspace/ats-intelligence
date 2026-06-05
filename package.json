@@ -1,0 +1,12 @@
+{
+  "name": "ats-intelligence",
+  "version": "1.0.0",
+  "description": "ATS Intelligence - AI Resume Scoring Platform",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}
