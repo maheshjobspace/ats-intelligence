@@ -973,6 +973,11 @@ function showHome() {
 
 function goToAnalyze() {
   showPage('analyze');
+  // Always show the form, never the results
+  document.getElementById('analyze-form-section').style.display = '';
+  document.getElementById('loaderSection').classList.remove('show');
+  document.getElementById('resultsSection').classList.remove('show');
+  document.getElementById('analyzeBtn').disabled = false;
 }
 
 // ═══════════════════════════════
@@ -1119,9 +1124,8 @@ async function flowStep2SendOtp() {
     err.classList.add('show');
     if(window._rcv) { try { window._rcv.clear(); } catch(x){} window._rcv = null; }
   } finally {
-    btn.disabled = false;
     btn.textContent = 'Send OTP →';
-    document.getElementById('fPhone').value.length >= 10 || (btn.disabled = true);
+    btn.disabled = document.getElementById('fPhone').value.trim().length < 10;
   }
 }
 
@@ -1350,6 +1354,7 @@ function showSampleReport() {
   showPage('analyze');
   document.getElementById('analyze-form-section').style.display = 'none';
   document.getElementById('loaderSection').classList.remove('show');
+  document.getElementById('resultsSection').classList.remove('show');
   renderResults(sampleData, 'Sample — Senior Software Engineer');
 }
 
