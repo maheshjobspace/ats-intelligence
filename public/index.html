@@ -827,7 +827,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
 
 
 <!-- Firebase invisible reCAPTCHA — required for Phone Auth, do not remove -->
-<div id="recaptcha-container" style="position:fixed;bottom:0;right:0;z-index:0;opacity:0;pointer-events:none;"></div>
+<div id="recaptcha-container" style="position:fixed;bottom:4px;right:4px;z-index:9999;"></div>
 
 </body>
 </html>
@@ -883,8 +883,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
           <option value="+65">🇸🇬 +65</option>
           <option value="+61">🇦🇺 +61</option>
         </select>
-        <input class="auth-phone-input" type="tel" id="fPhone" placeholder="98765 43210" maxlength="10" inputmode="numeric"
-          oninput="this.value=this.value.replace(/\D/g,\'\');document.getElementById(\'fBtn2\').disabled=this.value.length<10"/>
+        <input class="auth-phone-input" type="tel" id="fPhone" placeholder="98765 43210" maxlength="10" inputmode="numeric" oninput="onPhoneInput(this)"/>
       </div>
       <button class="flow-btn" id="fBtn2" onclick="flowStep2SendOtp()" disabled>Send OTP →</button>
       <div style="display:flex;justify-content:center;gap:1rem;margin-top:1rem;">
@@ -920,7 +919,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2re
 </div>
 
 <!-- Firebase reCAPTCHA container -->
-<div id="recaptcha-container" style="position:fixed;bottom:0;right:0;z-index:0;opacity:0;pointer-events:none;"></div>
 
 <!-- Firebase -->
 <script type="module">
@@ -957,6 +955,14 @@ let resumeText = '';
 let flowConfirmation = null;
 let flowTimerInterval = null;
 let currentFlowStep = 1;
+
+// ═══════════════════════════════
+// PHONE INPUT HANDLER
+// ═══════════════════════════════
+function onPhoneInput(el) {
+  el.value = el.value.replace(/\D/g, '');
+  document.getElementById('fBtn2').disabled = el.value.length < 10;
+}
 
 // ═══════════════════════════════
 // NAVIGATION
@@ -1093,23 +1099,27 @@ async function flowStep2SendOtp() {
   err.classList.remove('show');
 
   if(phone.length < 10) { err.textContent = 'Enter a valid 10-digit number.'; err.classList.add('show'); return; }
-  if(!window._fbAuth) { err.textContent = 'Loading Firebase... please wait 2 seconds and try again.'; err.classList.add('show'); return; }
+  if(!window._fbAuth || !window._RecaptchaVerifier || !window._signInWithPhoneNumber) {
+    err.textContent = 'Firebase not loaded yet. Please wait 3 seconds and try again.';
+    err.classList.add('show'); return;
+  }
 
   const fullPhone = code + phone;
   btn.disabled = true;
-  btn.textContent = 'Sending OTP...';
+  btn.textContent = 'Sending...';
 
   try {
-    // Clear old verifier
-    if(window._rcv) { try { window._rcv.clear(); } catch(e){} window._rcv = null; }
-    window._rcv = new window._RecaptchaVerifier(window._fbAuth, 'recaptcha-container', { size:'invisible', callback:()=>{} });
+    if(window._rcv) { try { window._rcv.clear(); } catch(x){} window._rcv = null; }
+    window._rcv = new window._RecaptchaVerifier(window._fbAuth, 'recaptcha-container', {
+      size: 'invisible',
+      callback: () => {},
+      'expired-callback': () => { if(window._rcv){ try{window._rcv.clear();}catch(x){} window._rcv=null; } }
+    });
+    await window._rcv.render();
     flowConfirmation = await window._signInWithPhoneNumber(window._fbAuth, fullPhone, window._rcv);
-
-    // Success — go to OTP step
     const display = code + ' ' + phone.slice(0,5) + ' ' + phone.slice(5);
     document.getElementById('fOtpSub').textContent = 'We sent a 6-digit code to ' + display;
     showFlowStep(3);
-    // Reset OTP boxes
     for(let i=0;i<6;i++) { const el=document.getElementById('fo'+i); el.value=''; el.classList.remove('filled'); }
     document.getElementById('fBtn3').disabled = true;
     document.getElementById('fErr3').classList.remove('show');
@@ -1117,10 +1127,14 @@ async function flowStep2SendOtp() {
     startFlowTimer();
     setTimeout(() => document.getElementById('fo0').focus(), 100);
   } catch(e) {
-    console.error(e);
-    err.textContent = e.code === 'auth/too-many-requests' ? 'Too many attempts. Wait and try again.'
-      : e.code === 'auth/invalid-phone-number' ? 'Invalid phone number. Check and retry.'
-      : 'Failed to send OTP: ' + e.message;
+    console.error('OTP error:', e);
+    const msg = e.code === 'auth/too-many-requests' ? 'Too many attempts. Please wait and try again.'
+      : e.code === 'auth/invalid-phone-number' ? 'Invalid phone number. Use format: 9876543210'
+      : e.code === 'auth/captcha-check-failed' ? 'reCAPTCHA failed. Please refresh and try again.'
+      : e.code === 'auth/operation-not-allowed' ? 'Phone auth not enabled in Firebase console.'
+      : e.code === 'auth/billing-not-enabled' ? 'Firebase billing not enabled. Upgrade to Blaze plan.'
+      : (e.message || 'Failed to send OTP. Check console for details.');
+    err.textContent = msg;
     err.classList.add('show');
     if(window._rcv) { try { window._rcv.clear(); } catch(x){} window._rcv = null; }
   } finally {
